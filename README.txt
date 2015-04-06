@@ -1,23 +1,27 @@
-PLAYTUNE interprets a sequence of simple commands ("note on", "note off", and "wait") that 
-represents a polyphonic musical score without volume modulation.  Once the score has started 
-playing, background interrupt routines use the Arduino counters to generate tones in sequence 
-at the right time.  As many as six notes can play simultaneously, depending on the processor used.
-A separate open-source project called MIDITONES (https://github.com/lenshustek/miditones) can 
-generatae the command sequence from a standard MIDI file.
+PLAYTUNE interprets a sequence of simple commands ("note on", "note off", and "wait")
+that represents a polyphonic musical score without volume modulation.  Once the score
+has started playing, background interrupt routines use the Arduino counters to 
+generate tones in sequence at the right time.  As many as six notes can play 
+simultaneously, depending on the processor used. A separate open-source project called 
+MIDITONES (https://github.com/lenshustek/miditones) can generate the command sequence 
+from a standard MIDI file.
 
-To try out Playtune, create a directory in your arduino\libraries directory called "Playtune", 
-and copy the Playtune.cpp and Playtune.h files to it.  Then create a new sketch using one of the
-test programs (test_nano.pde or test_mega.pde), which reference the library by way of "#include <Playtune.h>".
+To try out Playtune, create a directory in your arduino\libraries directory called
+"Playtune", and copy the Playtune.cpp and Playtune.h files to it.  Then create a new 
+sketch using one of the test programs (test_nano.pde or test_mega.pde), which reference 
+the library by way of "#include <Playtune.h>".
 
-Update on 28 Feb 2011: I fixed a bug that caused it to hang for short delays, and updated the sample scores.
+Update on 28 Feb 2011: I fixed a bug that caused it to hang for short delays, and 
+updated the sample scores.
 
-Update on 1 Dec 2011: I added a photo and samples of 6-channel playing on the Arduino MEGA 2560 with just 
-a 9V battery and a speaker.
+Update on 1 Dec 2011: I added a photo and samples of 6-channel playing on the 
+Arduino MEGA 2560 with just a 9V battery and a speaker.
 
-Update on 10 June 2013: I made it compatible with the Arduino V1.0.x development environment.
+Update on 10 June 2013: I made it compatible with the Arduino V1.0.x development 
+environment.
 
-Update on 5 April 2015: I originally put this up at code.google.org in 2011, but since Google is 
-getting out of the source hosting business, I've moved it to GitHub.
+Update on 5 April 2015: I originally put this up at code.google.org in 2011, but 
+since Google is getting out of the source hosting business, I've moved it to GitHub.
 
 /*---------------------------------------------------------------------------------
 *
