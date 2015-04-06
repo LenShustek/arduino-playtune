@@ -2,8 +2,9 @@
 //
 // Test of playtune library for Arduino MEGA 2560
 //
-// L. Shustek, 31 Jan 2011, initial release.
-// L. Shustek, 27 Feb 2011, new score data
+// L. Shustek, 31 Jan 2011; initial release.
+// L. Shustek, 27 Feb 2011; new score data
+// L. Shustek, 6 April 2015; change for compatibility with Arduino IDE v1.6.x
 //
 //**************************************************
 
@@ -14,7 +15,7 @@
 //------------------------------------------------
 
 // Playtune bytestream for file "bach_bwv847.mid" created by MIDITONES V1.1 on Sat Feb 26 13:03:42 2011
-byte PROGMEM score1 [] = {
+const byte PROGMEM score1 [] = {
 0,83, 0x90,0x48, 0x91,0x30, 0,154, 0x92,0x3F, 0x93,0x37, 0,131, 0x83, 0x82, 0,23, 0x92,0x3E, 0x93,0x35, 
 0,131, 0x83, 0x82, 0,23, 0x92,0x3F, 0x93,0x37, 0,131, 0x83, 0x82, 0,23, 0x92,0x3C, 0x93,0x33, 0,154, 
 0x94,0x3F, 0x95,0x37, 0,131, 0x85, 0x84, 0,23, 0x94,0x3E, 0x95,0x35, 0,131, 0x85, 0x84, 0,23, 0x94,0x3F, 
@@ -487,7 +488,7 @@ byte PROGMEM score1 [] = {
 // This score contains 10099 bytes, and 6 tone generators are used.
 
 // Playtune bytestream for file "mapleaf2.mid" created by MIDITONES V1.1 on Sat Feb 26 13:02:34 2011
-byte PROGMEM score2 [] = {
+const byte PROGMEM score2 [] = {
 // Maple Leaf Rag
 3,232, 0x90,0x27, 0x91,0x33, 1,77, 0x81, 0x80, 0x90,0x2C, 0x91,0x38, 0,166, 0x92,0x44, 0,166, 0x82, 
 0x81, 0x80, 0x90,0x33, 0x91,0x3C, 0x92,0x38, 0x93,0x3F, 0x94,0x4B, 0,166, 0x84, 0x83, 0x93,0x44, 0,166, 0x83, 

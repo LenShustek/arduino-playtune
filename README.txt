@@ -23,6 +23,8 @@ environment.
 Update on 5 April 2015: I originally put this up at code.google.org in 2011, but 
 since Google is getting out of the source hosting business, I've moved it to GitHub.
 
+Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
+
 /*---------------------------------------------------------------------------------
 *
 *                              About Playtune

@@ -31,7 +31,9 @@
 *   4 December 2011, L. Shustek, V1.2
 *     - add special TESLA_COIL mods
 *  10 June 2013, L. Shustek, V1.3
-*     - change to be compatible with Arduino IDE version 1.0.5
+*     - change for compatibility with Arduino IDE version 1.0.5
+*   6 April 2015, L. Shustek, V1.4
+*     - change for compatibility with Arduino IDE version 1.6.x
 *
 */
 
@@ -186,7 +188,7 @@
 #define DBUG 0       /* debugging? */
 #define TESLA_COIL 0 /* special Tesla Coil version? */
 
-#include <avr/arduino.h>
+#include <arduino.h>
 
 #include "playtune.h"
 
@@ -261,8 +263,8 @@ volatile boolean doing_delay = false;          /* are we using it for a tune_del
 volatile unsigned long wait_toggle_count;      /* countdown score waits */
 volatile unsigned long delay_toggle_count;     /* countdown tune_ delay() delays */
 
-volatile byte *score_start = 0;
-volatile byte *score_cursor = 0;
+volatile const byte *score_start = 0;
+volatile const byte *score_cursor = 0;
 volatile boolean Playtune::tune_playing = false;
 
 // Table of midi note frequencies * 2
@@ -569,7 +571,7 @@ void tune_stopnote (byte chan) {
 // Start playing a score
 //-----------------------------------------------
 
-void Playtune::tune_playscore (byte *score) {
+void Playtune::tune_playscore (const byte *score) {
     score_start = score;
     score_cursor = score;
     tune_stepscore();  /* execute initial commands */

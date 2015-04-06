@@ -1,11 +1,12 @@
-//**************************************************
+//*****************************************************************************
 //
 // Test of playtune library for Arduino NANO
 //
 // L. Shustek, 31 Jan 2011, initial release.
 // L. Shustek, 27 Feb 2011, new score data
+// L. Shustek, 6 April 2015; change for compatibility with Arduino IDE v1.6.x
 //
-//**************************************************
+//*****************************************************************************
 
 
 #include <Playtune.h>
@@ -15,7 +16,7 @@
 //------------------------------------------------
 
 // Playtune bytestream for file "bach_bwv798.mid" created by MIDITONES V1.1 on Sun Feb 27 12:45:00 2011
-byte PROGMEM score [] = {
+const byte PROGMEM score [] = {
   // Sinfonia No.12 in A major BWV.798 J.S.Bach
   // Conductor Track
   7,208, 0x90,0x45, 0x91,0x39, 1,77, 0x80, 0x81, 0x90,0x44, 0,166, 0x80, 0x90,0x45, 0,166, 0x80, 0x90,0x47, 
@@ -175,14 +176,14 @@ Playtune pt;
 
 void setup() {
 
-  // Enable all 3 NANO timers for notes that are output on digital pins 2, 3, and 4.
+  // Enable all 3 NANO timers for notes that are output on digital pins 10, 11, and 12.
   // Those pins should be wired to 500-ohm resistors, the other ends of which should be connected together
   // to one terminal of an 8-ohm speaker.  The other terminal of the speaker should be connected to ground.  
   // No other hardware is needed!
 
-  pt.tune_initchan (2); 
-  pt.tune_initchan (3);
-  pt.tune_initchan (4);
+  pt.tune_initchan (10); 
+  pt.tune_initchan (11);
+  pt.tune_initchan (12);
 }
 
 void loop () {
