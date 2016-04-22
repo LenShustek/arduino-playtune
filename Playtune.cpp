@@ -240,11 +240,11 @@ volatile byte timer5_pin_mask;
 #if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
 #define AVAILABLE_TIMERS 6
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 3, 4, 5, 1, 0 };
+    1, 2, 3, 4, 5, 0 };
 #elif defined(__AVR_ATmega8__)
 #define AVAILABLE_TIMERS 2
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 1 };
+    1, 2 };
 #elif defined(__AVR_ATmega32U4__)
 #define AVAILABLE_TIMERS 3
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
@@ -252,7 +252,7 @@ const byte PROGMEM tune_pin_to_timer_PGM[] = {
     #else
 #define AVAILABLE_TIMERS 3
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 1, 0 };
+    1, 2, 0 };
 #endif
 
 //  Other local varables
