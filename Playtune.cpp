@@ -34,7 +34,8 @@
 *     - change for compatibility with Arduino IDE version 1.0.5
 *   6 April 2015, L. Shustek, V1.4
 *     - change for compatibility with Arduino IDE version 1.6.x
-*
+*  28 May 2016, T. Wasiluk
+*     - added support for ATmega32U4
 */
 
 /*---------------------------------------------------------------------------------
@@ -79,7 +80,7 @@
 *    silkscreened on the Arduino board.  Calling this more times than your processor
 *    has timers will do no harm, but will not help either.
 *
-*  void tune_playscore (byte *score)
+*  void tune_playscore(byte *score)
 *
 *    Call this pointing to a "score bytestream" to start playing a tune.  It will
 *    only play as many simultaneous notes as you have initialized tone generators;
@@ -94,13 +95,13 @@
 *
 *    This will stop a currently playing score without waiting for it to end by itself.
 *
-*  void tune_delay (unsigned int msec)
+*  void tune_delay(unsigned int msec)
 *
 *    Delay for "msec" milliseconds.  This is provided because the usual Arduino
 *    "delay" function will stop working if you use all of your processor's
 *    timers for generating tones.
 *
-*  void tune_stopchans ()
+*  void tune_stopchans()
 *
 *    This disconnects all the timers from their pins and stops the interrupts.
 *    Do this when you don't want to play any more tunes.
@@ -263,7 +264,7 @@ byte _tune_num_chans = 0;
 /* one of the timers is also used to time
 - score waits (whether or not that timer is playing a note)
 - tune_delay() delay requests
-We currently use timer1, since that one is the common one available on different microcontrollers
+We currently use timer1, since that is the common one available on different microcontrollers
 */
 volatile unsigned wait_timer_frequency2;       /* its current frequency */
 volatile unsigned wait_timer_old_frequency2;   /* its previous frequency */

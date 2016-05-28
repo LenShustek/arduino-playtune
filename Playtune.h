@@ -30,6 +30,8 @@
 *     - change for compatibility with Arduino IDE version 1.0.5
 *   6 April 2015, L. Shustek, V1.4
 *     - change for compatibility with Arduino IDE version 1.6.x
+*  28 May 2016, T. Wasiluk
+*     - added support for ATmega32U4
 */
 
 #ifndef Playtune_h
