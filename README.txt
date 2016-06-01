@@ -25,6 +25,10 @@ since Google is getting out of the source hosting business, I've moved it to Git
 
 Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
 
+Update on 28 May 2016: Added support for Atmega32U4 (Arduino Leonardo) by moving
+score timing to Timer1. Examples were moved to appropriate subdirectories to be
+listed in the Arduino IDE.
+
 /*---------------------------------------------------------------------------------
 *
 *                              About Playtune
@@ -65,7 +69,7 @@ Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
 *    silkscreened on the Arduino board.  Calling this more times than your processor
 *    has timers will do no harm, but will not help either.
 *
-*  void tune_playscore (byte *score)
+*  void tune_playscore(byte *score)
 *
 *    Call this pointing to a "score bytestream" to start playing a tune.  It will
 *    only play as many simultaneous notes as you have initialized tone generators;
@@ -86,7 +90,7 @@ Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
 *    "delay" function will stop working if you use all of your processor's
 *    timers for generating tones.
 *
-*  void tune_stopchans ()
+*  void tune_stopchans()
 *
 *    This disconnects all the timers from their pins and stops the interrupts.
 *    Do this when you don't want to play any more tunes.
@@ -141,6 +145,7 @@ Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
 *    ATMega8: 2 tones  (timers 2 and 1)
 *    ATmega168/328: 3 tones (timers 2, 1, and 0)
 *    ATmega1280/2560: 6 tones (timers 2, 3, 4, 5, 1, and 0)
+*    ATmega32U4: 3 tones (timers 3, 1, 0)
 *
 *  The order listed above is the order that timers are assigned as you make
 *  succesive calls to play_initchan().  Timer 0 is assigned last, because using

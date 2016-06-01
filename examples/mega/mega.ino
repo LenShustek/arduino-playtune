@@ -5,6 +5,7 @@
 // L. Shustek, 31 Jan 2011; initial release.
 // L. Shustek, 27 Feb 2011; new score data
 // L. Shustek, 6 April 2015; change for compatibility with Arduino IDE v1.6.x
+// T. Wasiluk, 28 May 2016; moved to appropriate library examples subdirectory
 //
 //**************************************************
 

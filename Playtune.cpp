@@ -34,7 +34,8 @@
 *     - change for compatibility with Arduino IDE version 1.0.5
 *   6 April 2015, L. Shustek, V1.4
 *     - change for compatibility with Arduino IDE version 1.6.x
-*
+*  28 May 2016, T. Wasiluk
+*     - added support for ATmega32U4
 */
 
 /*---------------------------------------------------------------------------------
@@ -79,7 +80,7 @@
 *    silkscreened on the Arduino board.  Calling this more times than your processor
 *    has timers will do no harm, but will not help either.
 *
-*  void tune_playscore (byte *score)
+*  void tune_playscore(byte *score)
 *
 *    Call this pointing to a "score bytestream" to start playing a tune.  It will
 *    only play as many simultaneous notes as you have initialized tone generators;
@@ -94,13 +95,13 @@
 *
 *    This will stop a currently playing score without waiting for it to end by itself.
 *
-*  void tune_delay (unsigned int msec)
+*  void tune_delay(unsigned int msec)
 *
 *    Delay for "msec" milliseconds.  This is provided because the usual Arduino
 *    "delay" function will stop working if you use all of your processor's
 *    timers for generating tones.
 *
-*  void tune_stopchans ()
+*  void tune_stopchans()
 *
 *    This disconnects all the timers from their pins and stops the interrupts.
 *    Do this when you don't want to play any more tunes.
@@ -155,6 +156,7 @@
 *    ATMega8: 2 tones  (timers 2 and 1)
 *    ATmega168/328: 3 tones (timers 2, 1, and 0)
 *    ATmega1280/2560: 6 tones (timers 2, 3, 4, 5, 1, and 0)
+*    ATmega32u: 3 tones (timers 3, 1, 0)
 *
 *  The order listed above is the order that timers are assigned as you make
 *  succesive calls to play_initchan().  Timer 0 is assigned last, because using
@@ -216,13 +218,17 @@ volatile byte timer0_pin_mask;
 volatile byte *timer1_pin_port;
 volatile byte timer1_pin_mask;
 
+#if !defined(__AVR_ATmega32U4__)
 volatile byte *timer2_pin_port;
 volatile byte timer2_pin_mask;
+#endif
 
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
 volatile byte *timer3_pin_port;
 volatile byte timer3_pin_mask;
+#endif
 
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
 volatile byte *timer4_pin_port;
 volatile byte timer4_pin_mask;
 
@@ -235,15 +241,19 @@ volatile byte timer5_pin_mask;
 #if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
 #define AVAILABLE_TIMERS 6
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 3, 4, 5, 1, 0 };
+    1, 2, 3, 4, 5, 0 };
 #elif defined(__AVR_ATmega8__)
 #define AVAILABLE_TIMERS 2
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 1 };
-#else
+    1, 2 };
+#elif defined(__AVR_ATmega32U4__)
 #define AVAILABLE_TIMERS 3
 const byte PROGMEM tune_pin_to_timer_PGM[] = {
-    2, 1, 0 };
+    1, 0, 3 };
+    #else
+#define AVAILABLE_TIMERS 3
+const byte PROGMEM tune_pin_to_timer_PGM[] = {
+    1, 2, 0 };
 #endif
 
 //  Other local varables
@@ -254,7 +264,7 @@ byte _tune_num_chans = 0;
 /* one of the timers is also used to time
 - score waits (whether or not that timer is playing a note)
 - tune_delay() delay requests
-We currently use timer2, since that one is the first to be allocated.
+We currently use timer1, since that is the common one available on different microcontrollers
 */
 volatile unsigned wait_timer_frequency2;       /* its current frequency */
 volatile unsigned wait_timer_old_frequency2;   /* its previous frequency */
@@ -335,8 +345,11 @@ void Playtune::tune_initchan(byte pin) {
             bitWrite(TCCR1B, CS10, 1);
             timer1_pin_port = portOutputRegister(digitalPinToPort(pin));
             timer1_pin_mask = digitalPinToBitMask(pin);
+            tune_playnote (0, 60);  /* start and stop channel 0 (timer 1) on middle C so wait/delay works */
+            tune_stopnote (0);
             break;
 
+#if !defined(__AVR_ATmega32U4__)
         case 2:
             // 8 bit timer
             TCCR2A = 0;
@@ -345,11 +358,10 @@ void Playtune::tune_initchan(byte pin) {
             bitWrite(TCCR2B, CS20, 1);
             timer2_pin_port = portOutputRegister(digitalPinToPort(pin));
             timer2_pin_mask = digitalPinToBitMask(pin);
-            tune_playnote (0, 60);  /* start and stop channel 0 (timer 2) on middle C so wait/delay works */
-            tune_stopnote (0);
             break;
+#endif
 
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
         case 3:
             // 16 bit timer
             TCCR3A = 0;
@@ -359,7 +371,9 @@ void Playtune::tune_initchan(byte pin) {
             timer3_pin_port = portOutputRegister(digitalPinToPort(pin));
             timer3_pin_mask = digitalPinToBitMask(pin);
             break;
+#endif
 
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
         case 4:
             // 16 bit timer
             TCCR4A = 0;
@@ -456,9 +470,12 @@ void tune_playnote (byte chan, byte note) {
 
 #if !defined(__AVR_ATmega8__)
             if (timer_num == 0)        TCCR0B = (TCCR0B & 0b11111000) | prescalarbits;
-            else
+            else {
 #endif
+#if !defined(__AVR_ATmega32U4__)
                 TCCR2B = (TCCR2B & 0b11111000) | prescalarbits;
+#endif            
+            }    
         }
         else  //******  16-bit timer  *********
         { // two choices for the 16 bit timers: ck/1 or ck/64
@@ -471,8 +488,10 @@ void tune_playnote (byte chan, byte note) {
             }
 
             if (timer_num == 1)        TCCR1B = (TCCR1B & 0b11111000) | prescalarbits;
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
             else if (timer_num == 3)        TCCR3B = (TCCR3B & 0b11111000) | prescalarbits;
+#endif          
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
             else if (timer_num == 4)        TCCR4B = (TCCR4B & 0b11111000) | prescalarbits;
             else if (timer_num == 5)        TCCR5B = (TCCR5B & 0b11111000) | prescalarbits;
 #endif
@@ -490,15 +509,16 @@ void tune_playnote (byte chan, byte note) {
 
         case 1:
             OCR1A = ocr;
-            bitWrite(TIMSK1, OCIE1A, 1);
-            break;
-
-        case 2:
-            OCR2A = ocr;
             wait_timer_frequency2 = frequency2;  // for "tune_delay" function
             wait_timer_playing = true;
+            bitWrite(TIMSK1, OCIE1A, 1);
+            break;
+#if !defined(__AVR_ATmega32U4__)
+        case 2:
+            OCR2A = ocr;            
             bitWrite(TIMSK2, OCIE2A, 1);
             break;
+#endif
 
 #if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
         case 3:
@@ -542,19 +562,23 @@ void tune_stopnote (byte chan) {
         break;
 #endif
     case 1:
-        TIMSK1 &= ~(1 << OCIE1A);                 // disable the interrupt
+        // We leave the timer1 interrupt running for the "tune_delay" function.
+        wait_timer_playing = false;
         *timer1_pin_port &= ~(timer1_pin_mask);   // keep pin low after stop
         break;
+#if !defined(__AVR_ATmega32U4__)
     case 2:
-        // We leave the timer2 interrupt running for the "tune_delay" function.
-        wait_timer_playing = false;
+        TIMSK2 &= ~(1 << OCIE1A);                 // disable the interrupt
         *timer2_pin_port &= ~(timer2_pin_mask);   // keep pin low after stop
         break;
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#endif
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
     case 3:
         TIMSK3 &= ~(1 << OCIE3A);                 // disable the interrupt
         *timer3_pin_port &= ~(timer3_pin_mask);   // keep pin low after stop
         break;
+#endif
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
     case 4:
         TIMSK4 &= ~(1 << OCIE4A);                 // disable the interrupt
         *timer4_pin_port &= ~(timer4_pin_mask);   // keep pin low after stop
@@ -690,14 +714,17 @@ void Playtune::tune_stopchans(void) {
         case 1:
             TIMSK1 &= ~(1 << OCIE1A);
             break;
+#if !defined(__AVR_ATmega32U4__)
         case 2:
             TIMSK2 &= ~(1 << OCIE2A);
             break;
-
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#endif
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
         case 3:
             TIMSK3 &= ~(1 << OCIE3A);
             break;
+#endif            
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
         case 4:
             TIMSK4 &= ~(1 << OCIE4A);
             break;
@@ -722,21 +749,15 @@ ISR(TIMER0_COMPA_vect) {
 }
 #endif
 
-#if !TESLA_COIL
 ISR(TIMER1_COMPA_vect) {  // TIMER 1
-    *timer1_pin_port ^= timer1_pin_mask;  // toggle the pin
-}
-#endif
 
-ISR(TIMER2_COMPA_vect) {  // TIMER 2
-
-    // Timer 2 is the one assigned first, so we keep it running always
+    // Timer 1 - we keep it running always
     // and use it to time score waits, whether or not it is playing a note.
 
     if (wait_timer_playing) { // toggle the pin if we're sounding a note
-    *timer2_pin_port ^= timer2_pin_mask;
+    *timer1_pin_port ^= timer1_pin_mask;
 #if TESLA_COIL
-    if (*timer2_pin_port & timer2_pin_mask) teslacoil_rising_edge (2);  // do a tesla coil pulse
+    if (*timer1_pin_port & timer1_pin_mask) teslacoil_rising_edge (2);  // do a tesla coil pulse
 #endif
     }
 
@@ -760,7 +781,15 @@ ISR(TIMER2_COMPA_vect) {  // TIMER 2
     if (doing_delay && delay_toggle_count) --delay_toggle_count;	// countdown for tune_delay()
 }
 
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
+#if !defined(__AVR_ATmega32U4__)
+#if !TESLA_COIL
+ISR(TIMER2_COMPA_vect) {  // TIMER 2
+    *timer2_pin_port ^= timer2_pin_mask;  // toggle the pin
+}
+#endif
+#endif
+
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
 
 ISR(TIMER3_COMPA_vect) {  // TIMER 3
     *timer3_pin_port ^= timer3_pin_mask;  // toggle the pin
@@ -768,7 +797,9 @@ ISR(TIMER3_COMPA_vect) {  // TIMER 3
     if (*timer3_pin_port & timer3_pin_mask) teslacoil_rising_edge (3);  // do a tesla coil pulse
 #endif
 }
+#endif
 
+#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
 ISR(TIMER4_COMPA_vect) {  // TIMER 4
     *timer4_pin_port ^= timer4_pin_mask;  // toggle the pin
 #if TESLA_COIL
