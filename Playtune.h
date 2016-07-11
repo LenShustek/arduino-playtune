@@ -32,12 +32,14 @@
 *     - change for compatibility with Arduino IDE version 1.6.x
 *  28 May 2016, T. Wasiluk
 *     - added support for ATmega32U4
+*  10 July 2016, Nick Shvelidze
+*     - Fixed include file names for Arduino 1.6 on Linux.
 */
 
 #ifndef Playtune_h
 #define Playtune_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 class Playtune
 {

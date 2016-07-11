@@ -11,23 +11,6 @@ To try out Playtune, create a directory in your arduino\libraries directory call
 sketch using one of the test programs (test_nano.pde or test_mega.pde), which reference 
 the library by way of "#include <Playtune.h>".
 
-Update on 28 Feb 2011: I fixed a bug that caused it to hang for short delays, and 
-updated the sample scores.
-
-Update on 1 Dec 2011: I added a photo and samples of 6-channel playing on the 
-Arduino MEGA 2560 with just a 9V battery and a speaker.
-
-Update on 10 June 2013: I made it compatible with the Arduino V1.0.x development 
-environment.
-
-Update on 5 April 2015: I originally put this up at code.google.org in 2011, but 
-since Google is getting out of the source hosting business, I've moved it to GitHub.
-
-Update on 6 April 2015: Change for compatibility with Arduino IDE v1.6.x
-
-Update on 28 May 2016: Added support for Atmega32U4 (Arduino Leonardo) by moving
-score timing to Timer1. Examples were moved to appropriate subdirectories to be
-listed in the Arduino IDE.
 
 /*---------------------------------------------------------------------------------
 *
@@ -147,8 +130,7 @@ listed in the Arduino IDE.
 *    ATmega1280/2560: 6 tones (timers 2, 3, 4, 5, 1, and 0)
 *    ATmega32U4: 3 tones (timers 3, 1, 0)
 *
-*  The order listed above is the order that timers are assigned as you make
-*  succesive calls to play_initchan().  Timer 0 is assigned last, because using
+*  Timer 0 is assigned last (except on the ATmega32u), because using 
 *  it will disable the Arduino millis(), delay(), and the PWM functions.
 *
 *  The lowest MIDI note that can be played using the 8-bit timers (0 and 2)

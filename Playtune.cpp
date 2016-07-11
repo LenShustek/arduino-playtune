@@ -36,6 +36,8 @@
 *     - change for compatibility with Arduino IDE version 1.6.x
 *  28 May 2016, T. Wasiluk
 *     - added support for ATmega32U4
+*  10 July 2016, Nick Shvelidze
+*     - Fixed include file names for Arduino 1.6 on Linux.
 */
 
 /*---------------------------------------------------------------------------------
@@ -158,8 +160,7 @@
 *    ATmega1280/2560: 6 tones (timers 2, 3, 4, 5, 1, and 0)
 *    ATmega32u: 3 tones (timers 3, 1, 0)
 *
-*  The order listed above is the order that timers are assigned as you make
-*  succesive calls to play_initchan().  Timer 0 is assigned last, because using
+*  Timer 0 is assigned last (except on the ATmega32u), because using 
 *  it will disable the Arduino millis(), delay(), and the PWM functions.
 *
 *  The lowest MIDI note that can be played using the 8-bit timers (0 and 2)
@@ -190,9 +191,9 @@
 #define DBUG 0       /* debugging? */
 #define TESLA_COIL 0 /* special Tesla Coil version? */
 
-#include <arduino.h>
+#include <Arduino.h>
 
-#include "playtune.h"
+#include "Playtune.h"
 
 #if defined(__AVR_ATmega8__)
 #define TCCR2A TCCR2
@@ -236,7 +237,7 @@ volatile byte *timer5_pin_port;
 volatile byte timer5_pin_mask;
 #endif
 
-// Define the order to allocate timers, leaving timers 1 and 0 to last.
+// Define the order to allocate timers.
 
 #if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
 #define AVAILABLE_TIMERS 6
